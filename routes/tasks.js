@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Task = require('../models/task.js');
+const Task = require('../models/Task.js');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
