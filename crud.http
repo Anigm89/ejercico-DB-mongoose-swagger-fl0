@@ -1,0 +1,29 @@
+POST http://localhost:8080/create
+Content-Type: application/json
+
+{
+    "title": "ejercicio 1",
+    "completed": false
+
+}
+
+###
+
+PUT http://localhost:8080/markAsCompleted/65cba7249fa85fda1d3299be
+Content-Type: application/json
+
+{
+    "completed": true
+}
+
+###
+
+PUT http://localhost:8080/id/65cba7249fa85fda1d3299be
+Content-Type: application/json
+
+{
+    "title": "challenge2"
+}
+
+###
+DELETE http://localhost:8080/id/65cba7249fa85fda1d3299be

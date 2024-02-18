@@ -1,87 +1,93 @@
 const express = require("express");
 const router = express.Router();
-const Task = require("../models/Task.js");
+const Task = require('../models/task.js');
 
-//CREATE TASK
-router.post("/create", async(req, res) => {
-    try {
-        const task = await Task.create({...req.body, completed: false });
-        res.status(201).send({ message: "Task successfully created", task });
-    } catch (error) {
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
+
+
+router.post('/create', async (req, res) => {
+    try{
+        const task = await Task.create(req.body);
+        res.status(201).send(task);
+    }
+    catch(error){
         console.error(error);
-        res
-            .status(500)
-            .send({ message: "There was a problem trying to create a task" });
+        res.status(500).send({mensaje:'error al crear una nueva tarea'})
     }
 });
 
-//GET TASKS
-
-router.get("/", async(req, res) => {
-    try {
+router.get('/', async (req,res) => {
+    try{
         const tasks = await Task.find();
-        res.send(tasks);
-    } catch (error) {
+        res.status(201).send(tasks)
+    }
+    catch(error){
         console.error(error);
+        res.status(500).send({ mensaje: 'Error al obtener las tareas' });
+    }
+   
+});
+
+router.get('/id/:_id', async (req, res) => {
+    try{
+        const id = req.params['_id'];
+        const tasksId = await Task.findById(id);
+        if (!tasksId) {
+            return res.status(404).json({ mensaje: 'Tarea no encontrada' });
+        }
+        res.send(tasksId)
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).send({ mensaje: 'Error al obtener las tareas por id' });
     }
 });
 
-//GET TASK BY ID
-
-router.get("/id/:_id", async(req, res) => {
-    try {
-        const task = await Task.findById(req.params._id);
-        res.send(task);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({
-            message: "There was a problem with the task with _id number: " +
-                req.params._id,
-        });
+router.put('/markAsCompleted/:_id', async (req, res) => {
+    try{
+        const id = req.params['_id'];
+        const taskId = await Task.findByIdAndUpdate(id, {completed: req.body.completed}, {new: true});
+        if(!taskId){
+            return res.status(404).send({mensaje:'No se ha encontrado la tarea'})
+        }
+        res.status(201).send(taskId)
     }
-}, )
+    catch(error){
+        console.error(error);
+        res.status(500).send({ mensaje: 'Error al marcar las tareas' });
+    }
+});
 
-//MARK TASK AS COMPLETED (en este endpoint no le permitimos que edite el titulo)
-
-router.put("/markAsCompleted/:_id", async(req, res) => {
-        try {
-            const task = await Task.findByIdAndUpdate(
-                req.params._id, {
-                    completed: true,
-                }, { new: true }
-            );
-            res.send({ message: "Task successfully updated", task });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send({
-                message: "There was a problem trying to update the task with _id: " +
-                    req.params._id,
-            });
+router.put('/id/:_id', async (req, res) => {
+    try{
+        const id = req.params['_id'];
+        const taskId = await Task.findByIdAndUpdate(id, {title: req.body.title}, {new: true,  omitUndefined: true});
+        if(!taskId){
+            return res.status(404).send({mensaje:'Tarea no encontrada'});
         }
-    }),
+        res.send(taskId);
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).send({ mensaje: 'Error al actualizar el nombre de la tarea' });
+    }
+});
 
-    //UPDATE TASK
+router.delete('/id/:_id', async (req, res) =>{
+    try{
+        const id = req.params['_id'];
+        const deleteTask = await Task.findByIdAndDelete(id);
 
-    router.put("/id/:_id", async(req, res) => {
-        try {
-            const task = await Task.findByIdAndUpdate(req.params._id, req.body, { new: true })
-            res.send({ message: "task successfully updated", task });
-        } catch (error) {
-            console.error(error);
+        if(!deleteTask){
+            return res.status(404).send({mensaje: 'Tarea no encontrada'})
         }
-    }),
+        res.send({mensaje:'Tarea eliminada'})
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).send({ mensaje: 'Error al borrar la tarea' });
+    }
+});
 
-    //DELETE TASK
-
-    router.delete("/id/:_id", async(req, res) => {
-        try {
-            const task = await Task.findByIdAndDelete(req.params._id);
-            res.send({ message: "task deleted", task });
-        } catch (error) {
-            console.error(error);
-            res
-                .status(500)
-                .send({ message: "There was a problem trying to delete a task" });
-        }
-    })
 module.exports = router;

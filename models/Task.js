@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const TaskSchema = new mongoose.Schema({
     title: String,
     completed: Boolean,
-}, { timestamps: true });
+}, {timestamps: true});
 
-const Task = mongoose.model('Task', TaskSchema);
+const Task = mongoose.model('task', TaskSchema);
 
 module.exports = Task;
