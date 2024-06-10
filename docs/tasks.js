@@ -82,6 +82,7 @@ module.exports = {
           },
           responses: {
             200: { description: "Task updated successfully" },
+            404: { description: "Task not found"},
             500: { description: "Server error" },
           },
         },
@@ -111,6 +112,7 @@ module.exports = {
             },
             responses: {
               200: { description: "Task deleted successfully" },
+              404: { description: "Task not found"},
               500: { description: "Server error" },
             },
         },
